@@ -1,0 +1,90 @@
+# The catalogs Vagrant reads, catalog/<box>.json, which GitHub Pages serves at minos.io/vagrant/<box>.json
+# as application/json (what tells Vagrant a catalog from a box). .github/catalog writes them from the
+# releases of minos-org/packers, where the boxes are published, read through its public API: no token of
+# another repository is needed. A catalog that changed is committed here. The catalogs are deployed
+# whenever what minos.io serves differs from them: a commit pushed with this workflow's token starts no
+# Pages build, so the deployment is this workflow's, and one that failed is retried on the next run.
+name: catalog
+
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash # bash -eo pipefail: a pipe fails when what feeds it fails
+
+env:
+  SITE: https://minos.io/vagrant
+
+jobs:
+  catalog:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # the catalogs are committed here
+    outputs:
+      deploy: ${{ steps.served.outputs.deploy }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: the catalogs, from the releases of minos-org/packers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: sh .github/catalog | tee -a "${GITHUB_STEP_SUMMARY}"
+
+      - name: commit them, when they changed
+        run: |
+          git add -A catalog
+          if git diff --cached --quiet; then
+              printf '%s\n' "the catalogs did not change" | tee -a "${GITHUB_STEP_SUMMARY}"
+              exit 0
+          fi
+          versions="$(jq -r '.versions[].version' catalog/*.json | sort -uV | paste -sd' ')"
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -q -m "catalog: the boxes of packers' releases ${versions:-(none)}"
+          git push -q origin "HEAD:${GITHUB_REF_NAME}"
+          printf '%s\n' "committed $(git rev-parse --short HEAD): ${versions:-no release}" | tee -a "${GITHUB_STEP_SUMMARY}"
+
+      - name: what minos.io serves
+        id: served
+        run: |
+          deploy=false
+          for file in catalog/*.json; do
+              url="${SITE}/${file#catalog/}"
+              if ! curl -fsS --retry 3 -o "${RUNNER_TEMP}/served.json" "${url}" ||
+                 ! cmp -s "${file}" "${RUNNER_TEMP}/served.json"; then
+                  deploy=true; printf '%s\n' "${url}: not what ${file} holds"
+              fi
+          done
+          printf 'deploy=%s\n' "${deploy}" | tee -a "${GITHUB_OUTPUT}" "${GITHUB_STEP_SUMMARY}"
+
+      - name: the catalogs as the site
+        if: steps.served.outputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: catalog/
+
+  deploy:
+    needs: catalog
+    if: needs.catalog.outputs.deploy == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write # the deployment
+      id-token: write # which tells Pages where it comes from
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

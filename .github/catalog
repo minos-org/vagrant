@@ -1,0 +1,63 @@
+#!/bin/sh
+#writes catalog/BOX.json, the catalog Vagrant reads at minos.io/vagrant/BOX.json, from the releases of
+#minos-org/packers, where the boxes are published: one version per release that holds minos-BOX.box,
+#newest first, each with the box's URL and its sha256, which is the digest GitHub computed for the file or,
+#when GitHub gives none, its line in the release's minos-BOX.sha256. The boxes are the ones a Vagrantfile
+#here reads from a catalog, and any box a release holds; a box no release holds yet gets a catalog with
+#no versions. Drafts, prereleases and releases not named by a day are not read.
+#A version is when its release was published, in UTC, YYYY.MM.DD.HHMM: packers names a release by its day
+#alone and a rebuild the same day takes the day over, so the tag would give a rebuilt box the version of
+#the one it replaces, which `vagrant box outdated` never offers. The box's URL keeps the release's tag
+#usage: .github/catalog   => rewrites catalog/*.json, one line per box; needs gh (GH_TOKEN in a workflow)
+#       and jq. Nothing is written unless every catalog could be
+
+packers="minos-org/packers"
+cd "$(dirname "${0}")/.." || exit 1
+tmp="$(mktemp -d)" || exit 1
+trap 'rm -rf "${tmp}"' EXIT
+
+_die() { printf "%s\\n" "catalog: ${*}" >&2; exit 1; }
+
+gh api --paginate "repos/${packers}/releases?per_page=100" > "${tmp}/pages" ||
+    _die "cannot read the releases of ${packers}"
+jq -s '[add // [] | .[] | select((.draft | not) and (.prerelease | not) and
+        (.tag_name | test("^[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}(\\.[0-9]+)?$")))]' "${tmp}/pages" > "${tmp}/releases" ||
+    _die "cannot parse the releases of ${packers}"
+
+{   sed -n 's|.*"https://minos\.io/vagrant/\([a-z]*-[0-9][0-9]\.[0-9][0-9]\)\.json".*|\1|p' ./*/Vagrantfile
+    jq -r '.[].assets[].name | capture("^minos-(?<box>[a-z]+-[0-9]{2}\\.[0-9]{2})\\.box$").box' "${tmp}/releases"
+} | sort -u > "${tmp}/boxes"
+[ -s "${tmp}/boxes" ] || _die "no box: no Vagrantfile reads a catalog and no release holds a box"
+
+mkdir -p "${tmp}/catalog"
+while IFS= read -r box; do
+    #"VERSION|URL|DIGEST|SHA256-FILE-URL", one line per release that holds the box; "|" and not a tab,
+    #which read would fold when the digest is empty
+    jq -r --arg box "minos-${box}.box" --arg sums "minos-${box}.sha256" '.[]
+        | (.assets[] | select(.name == $box)) as $file
+        | [(.published_at | "\(.[0:4]).\(.[5:7]).\(.[8:10]).\(.[11:13])\(.[14:16])"),
+           $file.browser_download_url, ($file.digest // "" | sub("^sha256:"; "")),
+           ([.assets[] | select(.name == $sums) | .browser_download_url][0] // "")] | join("|")' \
+        "${tmp}/releases" > "${tmp}/${box}.files" < /dev/null || _die "cannot read the files of ${box}"
+    : > "${tmp}/${box}.versions"
+    while IFS='|' read -r version url digest sums; do
+        if [ -z "${digest}" ] && [ -n "${sums}" ]; then
+            digest="$(curl -fsSL --retry 3 "${sums}" | awk -v f="minos-${box}.box" '$2 == f {print $1}')"
+        fi
+        printf "%s\\n" "${digest}" | grep -Eqx '[0-9a-f]{64}' ||
+            _die "${box} ${version}: no sha256, neither a digest nor a line in minos-${box}.sha256"
+        printf "%s\\t%s\\t%s\\n" "${version}" "${url}" "${digest}" >> "${tmp}/${box}.versions"
+    done < "${tmp}/${box}.files"
+    jq -R -s --arg name "minos/${box}" --arg description "minos ${box%-*} on Ubuntu ${box#*-} LTS" '
+        {name: $name, description: $description, versions: ([split("\n")[] | select(length > 0) | split("\t")
+            | {version: .[0], providers: [{name: "virtualbox", url: .[1], checksum_type: "sha256",
+                checksum: .[2], architecture: "amd64", default_architecture: true}]}]
+            | sort_by(.version | split(".") | map(tonumber)) | reverse)}' \
+        "${tmp}/${box}.versions" > "${tmp}/catalog/${box}.json" < /dev/null || _die "cannot write the catalog of ${box}"
+    printf "%-14s %s\\n" "${box}" "$(jq -r '[.versions[].version] | if length > 0 then join(" ") else "no release yet" end' \
+        "${tmp}/catalog/${box}.json" < /dev/null)"
+done < "${tmp}/boxes" || exit 1
+
+mkdir -p catalog && rm -f catalog/*.json && cp "${tmp}"/catalog/*.json catalog/
+
+# vim: set ts=8 sw=4 tw=0 ft=sh :

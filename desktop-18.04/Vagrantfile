@@ -17,14 +17,8 @@ hosts = [
 
 #raise "vagrant-hostmanager-ext plugin must be installed: $ vagrant plugin install vagrant-hostmanager-ext" unless Vagrant.has_plugin? "vagrant-hostmanager-ext"
 
-host_os  = RbConfig::CONFIG['host_os']
-if host_os =~ /linux/
-    all_cpus = `nproc`.to_i
-elsif host_os =~ /darwin/
-    all_cpus = `sysctl -n hw.ncpu`.to_i
-else #windows?
-    all_cpus = `wmic cpu get NumberOfCores`.split("\n")[2].to_i
-end
+require 'etc'
+all_cpus = Etc.nprocessors
 
 default_ram  = '512' #MB
 default_cpu  = '50'  #%
