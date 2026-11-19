@@ -3,7 +3,7 @@
   "description": "minos core on Ubuntu 24.04 LTS",
   "versions": [
     {
-      "version": "2026.11.19.4",
+      "version": "2026.11.19.1627",
       "providers": [
         {
           "name": "virtualbox",
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "version": "2026.11.19.3",
+      "version": "2026.11.19.0816",
       "providers": [
         {
           "name": "virtualbox",
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "version": "2026.11.19.2",
+      "version": "2026.11.19.0422",
       "providers": [
         {
           "name": "virtualbox",
