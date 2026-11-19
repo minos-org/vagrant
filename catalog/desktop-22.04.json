@@ -3,39 +3,13 @@
   "description": "minos desktop on Ubuntu 22.04 LTS",
   "versions": [
     {
-      "version": "2026.11.19.1627",
+      "version": "2026.11.19.2114",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.4/minos-desktop-22.04.box",
+          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19/minos-desktop-22.04.box",
           "checksum_type": "sha256",
-          "checksum": "9dd4598a6d789c2e5cbfcc2e5a543d01c54b0b86f510776ec59271a5a71cdc2a",
-          "architecture": "amd64",
-          "default_architecture": true
-        }
-      ]
-    },
-    {
-      "version": "2026.11.19.0816",
-      "providers": [
-        {
-          "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.3/minos-desktop-22.04.box",
-          "checksum_type": "sha256",
-          "checksum": "b43120ccdbfc1e8dce7cba590f3cc6ef385662392fac9d37ea0a5f4b208ec9fb",
-          "architecture": "amd64",
-          "default_architecture": true
-        }
-      ]
-    },
-    {
-      "version": "2026.11.19.0422",
-      "providers": [
-        {
-          "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.2/minos-desktop-22.04.box",
-          "checksum_type": "sha256",
-          "checksum": "9a95ebcc8d32101f0b92383e5ad3757b4a744c0a40e92ba2b218c5401a1a0765",
+          "checksum": "ce13aebeb9474b1bcc2218a27494cfeeea8aeb7b48e3942f306916ce3deabc8c",
           "architecture": "amd64",
           "default_architecture": true
         }

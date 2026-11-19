@@ -3,39 +3,13 @@
   "description": "minos core on Ubuntu 26.04 LTS",
   "versions": [
     {
-      "version": "2026.11.19.1627",
+      "version": "2026.11.19.2114",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.4/minos-core-26.04.box",
+          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19/minos-core-26.04.box",
           "checksum_type": "sha256",
-          "checksum": "a4e25c15008c6be94ac2847488b57e3ad3855393989192153c0455ec6d02935d",
-          "architecture": "amd64",
-          "default_architecture": true
-        }
-      ]
-    },
-    {
-      "version": "2026.11.19.0816",
-      "providers": [
-        {
-          "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.3/minos-core-26.04.box",
-          "checksum_type": "sha256",
-          "checksum": "aac36103e47146462ddec59aa57026b405b97bdbaff305027a70ef43bc3b532c",
-          "architecture": "amd64",
-          "default_architecture": true
-        }
-      ]
-    },
-    {
-      "version": "2026.11.19.0422",
-      "providers": [
-        {
-          "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.2/minos-core-26.04.box",
-          "checksum_type": "sha256",
-          "checksum": "341719b84771c8b6836d7283aac020e76e6ad2cfd8ef2c2d873334aceab02505",
+          "checksum": "bd6549821b1c8b4c6a8c00be42da3def4b9706ca31656ce608affaa29fa1d628",
           "architecture": "amd64",
           "default_architecture": true
         }

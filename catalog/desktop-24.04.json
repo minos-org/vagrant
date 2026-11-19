@@ -3,39 +3,13 @@
   "description": "minos desktop on Ubuntu 24.04 LTS",
   "versions": [
     {
-      "version": "2026.11.19.1627",
+      "version": "2026.11.19.2114",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.4/minos-desktop-24.04.box",
+          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19/minos-desktop-24.04.box",
           "checksum_type": "sha256",
-          "checksum": "ee4da37daffddd40424699a5948f0f6b951108158c5d0d57cd0e6f7e946e0865",
-          "architecture": "amd64",
-          "default_architecture": true
-        }
-      ]
-    },
-    {
-      "version": "2026.11.19.0816",
-      "providers": [
-        {
-          "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.3/minos-desktop-24.04.box",
-          "checksum_type": "sha256",
-          "checksum": "5a1f29569c36954a99d7824d22aac1ec9f6167eeb3596d8454268192e978c5cc",
-          "architecture": "amd64",
-          "default_architecture": true
-        }
-      ]
-    },
-    {
-      "version": "2026.11.19.0422",
-      "providers": [
-        {
-          "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.19.2/minos-desktop-24.04.box",
-          "checksum_type": "sha256",
-          "checksum": "03a9ab173b42ac6e430c4709f62623ed9636a3cc145c4fe53fce295ee2ba2559",
+          "checksum": "2fa4b66f83f9115ed6fe7f6e2e097e06b3634cdb2e47ffbd2383dafcc6267c52",
           "architecture": "amd64",
           "default_architecture": true
         }
