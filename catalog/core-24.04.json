@@ -3,13 +3,13 @@
   "description": "minos core on Ubuntu 24.04 LTS",
   "versions": [
     {
-      "version": "2026.11.20.0144",
+      "version": "2026.11.20.0759",
       "providers": [
         {
           "name": "virtualbox",
           "url": "https://github.com/minos-org/packers/releases/download/2026.11.20/minos-core-24.04.box",
           "checksum_type": "sha256",
-          "checksum": "68306bb36313fafa8d6eef2397b14cddae125e6bf57032e47c11088a3deb78d9",
+          "checksum": "d5de150a83b6ffacc7256c003576bfa55a0ac18833e91f506814350f12784832",
           "architecture": "amd64",
           "default_architecture": true
         }
