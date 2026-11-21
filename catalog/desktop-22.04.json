@@ -3,13 +3,13 @@
   "description": "minos desktop on Ubuntu 22.04 LTS",
   "versions": [
     {
-      "version": "2026.11.20.2313",
+      "version": "2026.11.21.1502",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.20/minos-desktop-22.04.box",
+          "url": "https://github.com/minos-org/packers/releases/download/2026.11.21/minos-desktop-22.04.box",
           "checksum_type": "sha256",
-          "checksum": "796d21ba3c1cac2c14ff4c88d67d118ef8ebb4f29e5cdf5ec8f5456aec05e80f",
+          "checksum": "2ad0fa3c37e36704fa85a132c1dd5e20aa1007e0b04ae198751bfe60371d000e",
           "architecture": "amd64",
           "default_architecture": true
         }

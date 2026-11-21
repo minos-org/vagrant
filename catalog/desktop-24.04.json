@@ -3,13 +3,13 @@
   "description": "minos desktop on Ubuntu 24.04 LTS",
   "versions": [
     {
-      "version": "2026.11.20.2313",
+      "version": "2026.11.21.1502",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.20/minos-desktop-24.04.box",
+          "url": "https://github.com/minos-org/packers/releases/download/2026.11.21/minos-desktop-24.04.box",
           "checksum_type": "sha256",
-          "checksum": "4c10e7d4dd29dd06a896d09d8af7b92d1c6a6eda9d53496407ee65d97bf031d7",
+          "checksum": "4b457234a49af3ada7e6342ee02a98b151f3d4ee07b4bbaec8076eb76f4e06fc",
           "architecture": "amd64",
           "default_architecture": true
         }

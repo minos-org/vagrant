@@ -3,13 +3,13 @@
   "description": "minos core on Ubuntu 26.04 LTS",
   "versions": [
     {
-      "version": "2026.11.20.2313",
+      "version": "2026.11.21.1502",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.20/minos-core-26.04.box",
+          "url": "https://github.com/minos-org/packers/releases/download/2026.11.21/minos-core-26.04.box",
           "checksum_type": "sha256",
-          "checksum": "ca1f5878e6918608b220e21cc0e29639d6920134129855685f482f03fddfd410",
+          "checksum": "ab3b5e8a13e1983d928acdf03f709cefe87a3df48f7749125ea9ea7ccfe75265",
           "architecture": "amd64",
           "default_architecture": true
         }
