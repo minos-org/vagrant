@@ -4,9 +4,15 @@
 # another repository is needed. A catalog that changed is committed here. The catalogs are deployed
 # whenever what minos.io serves differs from them: a commit pushed with this workflow's token starts no
 # Pages build, so the deployment is this workflow's, and one that failed is retried on the next run.
+# packers' publish job (its ci/catalog) pushes the catalogs here with a deploy key as soon as it publishes a
+# release, before it deletes the older ones: that push runs this workflow, which deploys them. This
+# workflow's own commits, pushed with its token, start no run, so there is no loop; the hourly run stays as
+# the fallback.
 name: catalog
 
 on:
+  push:
+    branches: [master]
   schedule:
     - cron: "41 * * * *"
   workflow_dispatch:

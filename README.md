@@ -3,8 +3,9 @@ About
 
 Recipes to use the official minos images for the [vagrant](https://www.vagrantup.com/) platform:
 
-The boxes from 22.04 on are built by [packers](https://github.com/minos-org/packers) (`minos.pkr.hcl`)
-and published as assets of its releases, each `.box` beside its `.sha256`.
+The boxes from 22.04 on are built by [packers](https://github.com/minos-org/packers) with minos' own
+installer (its live mode, `minos.io/s`) and published as assets of its releases, each `.box` beside its
+`.sha256`.
 Vagrant finds a box and its versions through the box's catalog, which this repository serves on
 GitHub Pages at `https://minos.io/vagrant/<box>.json`.
 
@@ -29,9 +30,8 @@ Catalog
 -------
 
 One JSON file per box, in Vagrant's box metadata format
-(https://developer.hashicorp.com/vagrant/docs/boxes/format): the box's name, and one entry per
-version with one provider per box file. Each release of packers is a version, newest first; packers
-keeps only its newest release, so a catalog lists one.
+(https://developer.hashicorp.com/vagrant/docs/boxes/format): the box's name, and one version, the
+newest release of packers that holds the box, with one provider per box file.
 
     {
       "name": "minos/core-24.04",
@@ -50,12 +50,13 @@ keeps only its newest release, so a catalog lists one.
     }
 
 - `version` is when the release was published, in UTC (`YYYY.MM.DD.HHMM`). The release itself, and the
-  box's `url`, are named by the day alone (`YYYY.MM.DD`), and a rebuild the same day takes the day's
-  release over: were the version the tag, the rebuilt box would carry the version of the one it replaces,
-  and `vagrant box outdated` would never offer it. Vagrant compares versions as RubyGems does, segment by
-  segment as numbers, so `2026.11.17.1630` comes after `2026.11.17.0915` and after the `2026.11.17.4` of
-  the releases named `YYYY.MM.DD.N` before (where `2026.11.17-1` would be a prerelease that comes before
-  it).
+  box's `url`, are named by the day (`YYYY.MM.DD`, or `YYYY.MM.DD.N` when the day has a release already),
+  and packers never reuses a tag, so a box's `url` never serves other bytes than its `checksum` names.
+  Were the version the tag, a box released later the same day (`2026.11.17.1`) would sort before the
+  version of the one before it (`2026.11.17.0915`), and `vagrant box outdated` would never offer it.
+  Vagrant compares versions as RubyGems does, segment by segment as numbers, so `2026.11.17.1630` comes
+  after `2026.11.17.0915` and after the `2026.11.17.4` of the releases named `YYYY.MM.DD.N` before
+  (where `2026.11.17-1` would be a prerelease that comes before it).
 - `architecture` and `default_architecture` are read by Vagrant 2.4 and ignored by older ones.
 - Vagrant tells a catalog from a box by the `Content-Type` of the answer (`application/json`). A release
   asset arrives as `application/octet-stream` and a raw file of the repository as `text/plain`, so
@@ -63,10 +64,13 @@ keeps only its newest release, so a catalog lists one.
   with `application/json`. The boxes themselves can stay release assets.
 
 `catalog/` holds the catalogs; GitHub Pages serves it as the root of `minos.io/vagrant/`. They are
-written, never edited: every hour `.github/workflows/catalog.yml` rewrites them from packers' releases
+written, never edited: `.github/workflows/catalog.yml` rewrites them from packers' releases
 (`.github/catalog`, which reads its public API), commits the ones that changed, and deploys `catalog/`
-whenever `minos.io/vagrant/` serves something else. A box with no release yet has a catalog with no
-versions.
+whenever `minos.io/vagrant/` serves something else. packers' publish job runs `.github/catalog` itself as
+soon as it publishes a release and pushes the catalogs here with a deploy key, which runs the workflow;
+it deletes its older releases only once `minos.io/vagrant/` serves the new catalogs and the CDN's cache
+has let go of the old ones. The workflow runs every hour too, as a fallback. A box with no release yet
+has a catalog with no versions.
 
 Dependencies
 ------------

@@ -1,13 +1,16 @@
 #!/bin/sh
 #writes catalog/BOX.json, the catalog Vagrant reads at minos.io/vagrant/BOX.json, from the releases of
-#minos-org/packers, where the boxes are published: one version per release that holds minos-BOX.box,
-#newest first, each with the box's URL and its sha256, which is the digest GitHub computed for the file or,
+#minos-org/packers, where the boxes are published: one version, the newest release that holds
+#minos-BOX.box, with the box's URL and its sha256, which is the digest GitHub computed for the file or,
 #when GitHub gives none, its line in the release's minos-BOX.sha256. The boxes are the ones a Vagrantfile
 #here reads from a catalog, and any box a release holds; a box no release holds yet gets a catalog with
 #no versions. Drafts, prereleases and releases not named by a day are not read.
-#A version is when its release was published, in UTC, YYYY.MM.DD.HHMM: packers names a release by its day
-#alone and a rebuild the same day takes the day over, so the tag would give a rebuilt box the version of
-#the one it replaces, which `vagrant box outdated` never offers. The box's URL keeps the release's tag
+#packers names a release by its day, YYYY.MM.DD, with .N when the day has one already, and never reuses a
+#tag, so a box's URL never serves other bytes than its checksum names. It publishes the new release before
+#it deletes the older ones, so a catalog that names only the newest never names a release about to go.
+#A version is when its release was published, in UTC, YYYY.MM.DD.HHMM, not its tag: the versions published
+#so far are such times, and a tag of the same day (2026.11.24.1) sorts before them (2026.11.24.0811), so
+#`vagrant box outdated` would never offer that box. The box's URL keeps the release's tag
 #usage: .github/catalog   => rewrites catalog/*.json, one line per box; needs gh (GH_TOKEN in a workflow)
 #       and jq. Nothing is written unless every catalog could be
 
@@ -31,9 +34,10 @@ jq -s '[add // [] | .[] | select((.draft | not) and (.prerelease | not) and
 
 mkdir -p "${tmp}/catalog"
 while IFS= read -r box; do
-    #"VERSION|URL|DIGEST|SHA256-FILE-URL", one line per release that holds the box; "|" and not a tab,
-    #which read would fold when the digest is empty
-    jq -r --arg box "minos-${box}.box" --arg sums "minos-${box}.sha256" '.[]
+    #"VERSION|URL|DIGEST|SHA256-FILE-URL" of the newest release that holds the box, none when no release
+    #does; "|" and not a tab, which read would fold when the digest is empty
+    jq -r --arg box "minos-${box}.box" --arg sums "minos-${box}.sha256" '
+        [.[] | select(any(.assets[]; .name == $box))] | sort_by(.published_at) | .[-1:][]
         | (.assets[] | select(.name == $box)) as $file
         | [(.published_at | "\(.[0:4]).\(.[5:7]).\(.[8:10]).\(.[11:13])\(.[14:16])"),
            $file.browser_download_url, ($file.digest // "" | sub("^sha256:"; "")),
