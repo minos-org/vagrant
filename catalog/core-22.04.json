@@ -3,13 +3,13 @@
   "description": "minos core on Ubuntu 22.04 LTS",
   "versions": [
     {
-      "version": "2026.11.24.1522",
+      "version": "2026.11.25.0910",
       "providers": [
         {
           "name": "virtualbox",
-          "url": "https://github.com/minos-org/packers/releases/download/2026.11.24.1/minos-core-22.04.box",
+          "url": "https://github.com/minos-org/packers/releases/download/2026.11.25/minos-core-22.04.box",
           "checksum_type": "sha256",
-          "checksum": "5401674963dcbc1e4f1359740e4fb0f2a84d6407ca29d7a263a217f97d7e12f0",
+          "checksum": "96bbb8256ff86561ed93c7e87d2d344ec1731427d79bf468c465ba801f7949a1",
           "architecture": "amd64",
           "default_architecture": true
         }
